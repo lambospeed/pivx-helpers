@@ -1,0 +1,58 @@
+#!/bin/bash
+
+# verify that your wallet is still on the main chain
+
+# Example output:
+#
+#Did it fork?
+#      block: 771478
+# block hash
+#      local: 00f8fec246f7e6e578ce7142d4c59bba9888aeab1918ed98f8e43fe9ee2f178e
+#pivxscan.io: 00f8fec246f7e6e578ce7142d4c59bba9888aeab1918ed98f8e43fe9ee2f178e
+#       GOOD: still on main
+
+set -e
+
+echo 'Did it fork?'
+
+pivxcli=~/.pivx/pivx-cli
+
+function getBlockNumber() {
+  $pivxcli getinfo | grep blocks | sed "s/.*: \([0-9]\+\).*/\1/"
+}
+
+function getLocalBlockHash() {
+  $pivxcli getblockhash $1
+}
+
+function getRemoteBlockHashPivxscan() {
+  local blockHeight=$1
+  curl -s 'http://pivxscan.io/api/getblockhash?index='$blockHeight
+}
+
+blockHeight=`getBlockNumber`
+localBlockHash=`getLocalBlockHash $blockHeight`
+presstabBlockHash=`get-remote-block-hash-presstab $blockHeight`
+blockHashCryptoId=`get-remote-block-hash-cryptoid $blockHeight`
+#pivxscanBlockHash=`getRemoteBlockHashPivxscan $blockHeight`
+
+echo ' block height: '$blockHeight
+echo ' block hash'
+echo '        local: '$localBlockHash
+echo 'presstab/pivx: '$presstabBlockHash
+echo 'cryptoid/pivx: '$blockHashCryptoId
+#echo '  pivxscan.io: '$pivxscanBlockHash'
+
+if [ $localBlockHash == $presstabBlockHash ]; then
+  echo '         GOOD: synced with presstab'
+else
+  echo '          BAD: you are on a fork, got to re-sync'
+fi
+
+if [ $localBlockHash == $blockHashCryptoId ]; then
+  echo '         GOOD: synced with cryptoid'
+else
+  echo '          BAD: you are on a fork, got to re-sync'
+fi
+
+exit 0

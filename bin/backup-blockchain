@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -e
+
+function makeBlockchainTar() {
+  local timestamp=`date +"%d:%m:%Y_%T_%Z"`
+
+  local tarname='blockchain_backup_'$timestamp'.tar.gz'
+
+  tar -zcv --force-local \
+  --exclude '**/*LOG*' \
+  --exclude '**/*LOCK' \
+  -f $tarname ~/.pivx/blocks ~/.pivx/chainstate ~/.pivx/sporks ~/.pivx/zerocoin
+
+  sha256sum $tarname
+}
+
+pivxd-stop
+
+makeBlockchainTar
+
+echo 'To extract do:'
+echo 'tar -xvzf TAR_PATH --force-local'
+
+exit 0

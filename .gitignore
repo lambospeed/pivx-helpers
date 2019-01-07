@@ -1,0 +1,23 @@
+*.dat
+*.conf
+*.log
+*.pid
+*.zip
+.lock
+balance
+balancezpiv
+backups/
+historic-backups
+blocks/
+chainstate/
+database/
+sporks/
+zerocoin/
+
+# pivx binaries
+pivx-cli
+pivxd
+pivx-tx
+pivx-qt
+test_pivx
+test_pivx-qt

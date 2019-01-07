@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -e
+
+pivxcli=~/.pivx/pivx-cli
+
+strings=`$pivxcli listunspent | jq '.[] | .address, .amount'`
+echo $strings
+
+unspent=`$pivxcli listunspent | jq '.[] | .amount'`
+
+total=0
+for amount in $unspent; do
+  total=$(bc <<< $total+$amount);
+done
+
+echo $total
+
+exit 0
+
+

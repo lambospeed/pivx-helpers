@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -e
+
+function rmBlockchain() {
+  rm -rfv  ~/.pivx/blocks
+  rm -rfv ~/.pivx/chainstate
+  rm -rfv ~/.pivx/sporks
+  rm -rfv ~/.pivx/zerocoin
+}
+
+pivxd-stop
+
+rmBlockchain
+
+echo 'blockchain files removed'
+
+exit 0

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Unlock your wallet for staking
+
+set -e
+
+read -s -p 'wallet passphrase: ' passphrase 
+echo ''
+
+timeout=999999999 #300 years
+anonymizeonly=true
+
+pivx-cli walletpassphrase $passphrase $timeout $anonymizeonly 
+
+echo 'wallet unlocked'
+
+pivx-cli getstakingstatus
+
+exit 0

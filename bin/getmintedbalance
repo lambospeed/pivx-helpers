@@ -1,0 +1,51 @@
+#!/bin/bash
+
+#TODO: perfect candidate to make it a python script
+
+# It tells you how many coins were minted since the last time you checked.
+# If you immediately check again the result will be zero until new coins are minted.
+
+# Example output:
+#
+#   last: 1
+#current: 3.4
+# minted: 2.4
+
+set -e
+
+balanceFile=~/.pivx/balance
+balanceFileZPIV=~/.pivx/balancezpiv
+
+function readBalanceFile() {
+  local default=$1
+  local filePath=$2
+
+  if [ ! -f $filePath ]; then
+    echo $default > $filePath
+  fi
+
+  head -n 1 $filePath
+}
+
+function updateBalanceFile() {
+  local filePath=$2
+  echo $1 > $filePath 
+}
+
+curr=`pivx-cli getbalance`;
+prev=`readBalanceFile $curr $balanceFile`;
+newpiv=$(bc <<< $curr-$prev);
+
+updateBalanceFile $curr $balanceFile
+
+currzpiv2=`pivx-cli getzerocoinbalance | jq .Total`;
+prevzpiv2=`readBalanceFile $currzpiv2 $balanceFileZPIV`;
+newzpiv2=$(bc <<< $currzpiv2-$prevzpiv2);
+
+updateBalanceFile $currzpiv2 $balanceFileZPIV
+
+echo '   last balance: piv '$prev' zpiv2 '$prevzpiv2;
+echo 'current balance: piv '$curr' zpiv2 '$currzpiv2;
+echo "recently minted: piv $newpiv          zpiv2 $newzpiv2";
+
+exit 0
